@@ -1,0 +1,30 @@
+{
+  "name": "dsa",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/dvail/dsa.git"
+  },
+  "author": "Dave Vail",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dvail/dsa/issues"
+  },
+  "homepage": "https://github.com/dvail/dsa#readme",
+  "devDependencies": {
+    "@swc/cli": "^0.1.46",
+    "@swc/core": "^1.2.66",
+    "@swc/jest": "^0.1.4",
+    "@types/jest": "^26.0.24",
+    "jest": "^27.0.6",
+    "typescript": "^4.3.5"
+  },
+  "dependencies": {
+    "ts-pattern": "^3.2.2"
+  }
+}
