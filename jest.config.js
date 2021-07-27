@@ -1,5 +1,11 @@
+/** @type {import('@ts-jest/dist/types').InitialOptionsTsJest} */
 module.exports = {
-  transform: {
-    '^.+\\.(t|j)sx?$': ['@swc/jest', {/* you swc configuration */}],
-  },
-}
+  preset: 'ts-jest/presets/default-esm',
+  testEnvironment: 'node',
+  collectCoverage: false,
+  globals: {
+    "ts-jest": {
+      useESM: true
+    }
+  }
+};
