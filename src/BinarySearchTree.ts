@@ -2,7 +2,34 @@ import { match } from 'ts-pattern';
 
 type TraversalType = 'PreOrder' | 'InOrder' | 'PostOrder'
 
-function traversePreOrder<WrappedType, RType>(
+type TreeDirection = 'left' | 'right'
+
+function insertValueDirection<WrappedType>(
+  tree: BinarySearchTree<WrappedType>,
+  value: WrappedType,
+  direction: TreeDirection,
+) {
+  if (!tree[direction]) {
+    tree[direction] = new BinarySearchTree(value)
+  } else {
+    insertValue(tree[direction], value);
+  }
+}
+
+function insertValue<WrappedType>(
+  tree: BinarySearchTree<WrappedType>,
+  value: WrappedType
+) {
+  if (tree.value === null) {
+    tree.value = value
+  } else if (value < tree.value) {
+    insertValueDirection(tree, value, 'left')
+  } else if (value > tree.value) {
+    insertValueDirection(tree, value, 'right')
+  }
+}
+
+function visitRoot<WrappedType, RType>(
   tree: BinarySearchTree<WrappedType>,
   fn: (value: WrappedType) => RType,
   acc: Array<RType>
@@ -10,14 +37,32 @@ function traversePreOrder<WrappedType, RType>(
   if (tree.value !== null) {
     acc.push(fn(tree.value))
   }
+}
 
-  if (tree.left) {
-    traversePreOrder(tree.left, fn, acc)
+function visitSubtree<WrappedType, RType>(
+  tree: BinarySearchTree<WrappedType>,
+  fn: (value: WrappedType) => RType,
+  acc: Array<RType>,
+  direction: TreeDirection,
+  traversal: (
+    tree: BinarySearchTree<WrappedType>,
+    fn: (value: WrappedType) => RType,
+    acc: Array<RType>
+  ) => void,
+) {
+  if (tree[direction]) {
+    traversal(tree[direction], fn, acc)
   }
+}
 
-  if (tree.right) {
-    traversePreOrder(tree.right, fn, acc)
-  }
+function traversePreOrder<WrappedType, RType>(
+  tree: BinarySearchTree<WrappedType>,
+  fn: (value: WrappedType) => RType,
+  acc: Array<RType>
+) {
+  visitRoot(tree, fn, acc)
+  visitSubtree(tree, fn, acc, 'left', traversePreOrder)
+  visitSubtree(tree, fn, acc, 'right', traversePreOrder)
 }
 
 function traverseInOrder<WrappedType, RType>(
@@ -25,17 +70,9 @@ function traverseInOrder<WrappedType, RType>(
   fn: (value: WrappedType) => RType,
   acc: Array<RType>
 ) {
-  if (tree.left) {
-    traverseInOrder(tree.left, fn, acc)
-  }
-
-  if (tree.value !== null) {
-    acc.push(fn(tree.value))
-  }
-
-  if (tree.right) {
-    traverseInOrder(tree.right, fn, acc)
-  }
+  visitSubtree(tree, fn, acc, 'left', traverseInOrder)
+  visitRoot(tree, fn, acc)
+  visitSubtree(tree, fn, acc, 'right', traverseInOrder)
 }
 
 function traversePostOrder<WrappedType, RType>(
@@ -43,17 +80,9 @@ function traversePostOrder<WrappedType, RType>(
   fn: (value: WrappedType) => RType,
   acc: Array<RType>
 ) {
-  if (tree.left) {
-    traversePostOrder(tree.left, fn, acc)
-  }
-
-  if (tree.right) {
-    traversePostOrder(tree.right, fn, acc)
-  }
-
-  if (tree.value !== null) {
-    acc.push(fn(tree.value))
-  }
+  visitSubtree(tree, fn, acc, 'left', traversePostOrder)
+  visitSubtree(tree, fn, acc, 'right', traversePostOrder)
+  visitRoot(tree, fn, acc)
 }
 
 export class BinarySearchTree<WrappedType> {
@@ -73,28 +102,7 @@ export class BinarySearchTree<WrappedType> {
 
   insert(value: WrappedType) {
     // Note, this does not handle the case of key equality
-    this.insertTree(this, value);
-  }
-
-  private insertTree(
-    tree: BinarySearchTree<WrappedType>,
-    value: WrappedType
-  ) {
-    if (tree.value === null) {
-      tree.value = value
-    } else if (value < tree.value) {
-      if (!tree.left) {
-        tree.left = new BinarySearchTree(value)
-      } else {
-        this.insertTree(tree.left, value);
-      }
-    } else if (value > tree.value) {
-      if (!tree.right) {
-        tree.right = new BinarySearchTree(value)
-      } else {
-        this.insertTree(tree.right, value);
-      }
-    }
+    insertValue(this, value);
   }
 
   search(value: WrappedType): WrappedType | null {
@@ -102,8 +110,8 @@ export class BinarySearchTree<WrappedType> {
   }
 
   traverse<RType>(
+    traversalType: TraversalType,
     fn: (value: WrappedType) => RType,
-    traversalType: TraversalType = 'InOrder',
   ): Array<RType> {
     let accumulator: Array<RType> = []
     match<TraversalType, void>(traversalType)
@@ -115,6 +123,6 @@ export class BinarySearchTree<WrappedType> {
   }
 
   toString(): string {
-    return this.traverse(n => `${n}`, 'InOrder').join(', ')
+    return this.traverse('InOrder', n => `${n}`).join(', ')
   }
 }

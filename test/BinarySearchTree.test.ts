@@ -18,9 +18,9 @@ test('BinarySearchTree traversals', () => {
   }
 
   let toString = (n: number) => `${n}`
-  let inOrder = tree.traverse(toString, 'InOrder').join(', ')
-  let preOrder = tree.traverse(toString, 'PreOrder').join(', ')
-  let postOrder = tree.traverse(toString, 'PostOrder').join(', ')
+  let inOrder = tree.traverse('InOrder', toString).join(', ')
+  let preOrder = tree.traverse('PreOrder', toString).join(', ')
+  let postOrder = tree.traverse('PostOrder', toString).join(', ')
 
   expect(inOrder).toBe('2, 3, 4, 10, 14, 19, 27, 31, 35, 42')
   expect(preOrder).toBe('14, 10, 2, 3, 4, 35, 19, 31, 27, 42')
