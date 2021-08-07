@@ -21,9 +21,10 @@ function addNode<T>(
 
 function removeNode<T>(
   target: ListNode<T>,
-) {
+) : T {
   target.prev.next = target.next
   target.next.prev = target.prev
+  return target.value as T
 }
 
 
@@ -65,14 +66,14 @@ export class LinkedListDeque<T> {
     return this.head.prev.value as T
   }
 
-  removeFirst() {
+  removeFirst() : T {
     this._size--
-    removeNode(this.head.next)
+    return removeNode(this.head.next)
   }
 
-  removeLast() {
+  removeLast() : T {
     this._size--
-    removeNode(this.head.prev)
+    return removeNode(this.head.prev)
   }
 
   remove(value: T) {
