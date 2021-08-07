@@ -24,7 +24,7 @@ function insertValue<WrappedType>(
     tree.value = value
   } else if (value < tree.value) {
     insertValueDirection(tree, value, 'left')
-  } else if (value > tree.value) {
+  } else {
     insertValueDirection(tree, value, 'right')
   }
 }
@@ -85,6 +85,33 @@ function traversePostOrder<WrappedType, RType>(
   visitRoot(tree, fn, acc)
 }
 
+function findMinimum<WrappedType>(tree: BinarySearchTree<WrappedType>) : WrappedType | null {
+  return tree.left ? findMinimum(tree.left) : tree.value
+}
+
+function findMaximum<WrappedType>(tree: BinarySearchTree<WrappedType>) : WrappedType | null {
+  return tree.right ? findMaximum(tree.right) : tree.value
+}
+
+function searchTree<WrappedType>(
+  tree: BinarySearchTree<WrappedType>,
+  value: WrappedType,
+) : BinarySearchTree<WrappedType> | null {
+  if (tree.value === null) {
+    return null
+  }
+
+  if (tree.value === value) {
+    return tree
+  } else if (tree.left && tree.value > value) {
+    return searchTree(tree.left, value)
+  } else if (tree.right && tree.value < value) {
+    return searchTree(tree.right, value)
+  } else {
+    return null
+  }
+}
+
 export class BinarySearchTree<WrappedType> {
   value: WrappedType | null
   left: BinarySearchTree<WrappedType>
@@ -105,8 +132,16 @@ export class BinarySearchTree<WrappedType> {
     insertValue(this, value);
   }
 
-  search(value: WrappedType): WrappedType | null {
-    return null
+  minimum(): WrappedType | null {
+    return findMinimum(this)
+  }
+
+  maximum(): WrappedType | null {
+    return findMaximum(this)
+  }
+
+  search(value: WrappedType): BinarySearchTree<WrappedType> | null {
+    return searchTree(this, value)
   }
 
   traverse<RType>(
