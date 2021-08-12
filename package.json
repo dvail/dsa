@@ -18,11 +18,13 @@
   "homepage": "https://github.com/dvail/dsa#readme",
   "devDependencies": {
     "@types/jest": "^26.0.24",
+    "@types/ramda": "github:types/npm-ramda#dist",
     "jest": "^27.0.6",
     "ts-jest": "^27.0.4",
     "typescript": "^4.3.5"
   },
   "dependencies": {
+    "ramda": "^0.27.1",
     "ts-pattern": "^3.2.2"
   }
 }

@@ -1,33 +1,8 @@
 import { match } from 'ts-pattern';
 
-type TraversalType = 'PreOrder' | 'InOrder' | 'PostOrder'
+export type TraversalType = 'PreOrder' | 'InOrder' | 'PostOrder'
 
-type TreeDirection = 'left' | 'right'
-
-function insertValueDirection<WrappedType>(
-  tree: BinarySearchTree<WrappedType>,
-  value: WrappedType,
-  direction: TreeDirection,
-) {
-  if (!tree[direction]) {
-    tree[direction] = new BinarySearchTree(value)
-  } else {
-    insertValue(tree[direction], value);
-  }
-}
-
-function insertValue<WrappedType>(
-  tree: BinarySearchTree<WrappedType>,
-  value: WrappedType
-) {
-  if (tree.value === null) {
-    tree.value = value
-  } else if (value < tree.value) {
-    insertValueDirection(tree, value, 'left')
-  } else {
-    insertValueDirection(tree, value, 'right')
-  }
-}
+export type TreeDirection = 'left' | 'right'
 
 function visitRoot<WrappedType, RType>(
   tree: BinarySearchTree<WrappedType>,
@@ -93,10 +68,10 @@ function findMaximum<WrappedType>(tree: BinarySearchTree<WrappedType>) : Wrapped
   return tree.right ? findMaximum(tree.right) : tree.value
 }
 
-function searchTree<WrappedType>(
-  tree: BinarySearchTree<WrappedType>,
+function searchTree<TreeType extends BinarySearchTree<WrappedType>, WrappedType>(
+  tree: TreeType,
   value: WrappedType,
-) : BinarySearchTree<WrappedType> | null {
+): TreeType | null {
   if (tree.value === null) {
     return null
   }
@@ -104,33 +79,20 @@ function searchTree<WrappedType>(
   if (tree.value === value) {
     return tree
   } else if (tree.left && tree.value > value) {
-    return searchTree(tree.left, value)
+    return searchTree(tree.left as TreeType, value)
   } else if (tree.right && tree.value < value) {
-    return searchTree(tree.right, value)
+    return searchTree(tree.right as TreeType, value)
   } else {
     return null
   }
 }
 
-export class BinarySearchTree<WrappedType> {
+export default abstract class BinarySearchTree<WrappedType extends any> {
   value: WrappedType | null
   left: BinarySearchTree<WrappedType>
   right: BinarySearchTree<WrappedType>
 
-  constructor(value?: WrappedType) {
-    if (value !== undefined) {
-      this.value = value
-      this.left = new BinarySearchTree()
-      this.right = new BinarySearchTree()
-    } else {
-      this.value = null
-    }
-  }
-
-  insert(value: WrappedType) {
-    // Note, this does not handle the case of key equality
-    insertValue(this, value);
-  }
+  abstract insert(value: WrappedType) : void
 
   minimum(): WrappedType | null {
     return findMinimum(this)
@@ -140,7 +102,7 @@ export class BinarySearchTree<WrappedType> {
     return findMaximum(this)
   }
 
-  search(value: WrappedType): BinarySearchTree<WrappedType> | null {
+  search(value: WrappedType): this | null {
     return searchTree(this, value)
   }
 
