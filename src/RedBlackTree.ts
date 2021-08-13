@@ -22,43 +22,41 @@ function insertValue<WrappedType>(
 function llRotate(parent: RedBlackTree<any>, target: RedBlackTree<any>) {
   let oldRight = target.right
   target.right = parent
-  target.parent = parent.parent
-  if (target.parent) {
-    if (target?.parent?.right === parent) {
-      target.parent.right = target
-    } else {
-      target.parent.left = target
-    }
+  target.parent = parent.parent!
+  if (target.parent.right === parent) {
+    target.parent.right = target
+  } else {
+    target.parent.left = target
   }
-  target.color = 'black'
   parent.left = oldRight
   oldRight.parent = parent
   parent.parent = target
+
+  target.color = 'black'
   parent.color = 'red'
 }
 
 function rrRotate(parent: RedBlackTree<any>, target: RedBlackTree<any>) {
   let oldLeft = target.left
   target.left = parent
-  target.parent = parent.parent
-  if (target.parent) {
-    if (target?.parent?.right === parent) {
-      target.parent.right = target
-    } else {
-      target.parent.left = target
-    }
+  target.parent = parent.parent!
+  if (target.parent.right === parent) {
+    target.parent.right = target
+  } else {
+    target.parent.left = target
   }
-  target.color = 'black'
   parent.right = oldLeft
   oldLeft.parent = parent
   parent.parent = target
+
+  target.color = 'black'
   parent.color = 'red'
 }
 
 function rotate(tree: RedBlackTree<any>) {
-  let parent = tree?.parent
-  let grandparent = parent?.parent
-  if (!parent || !grandparent) return
+  // We can asset non-null here, as rotation will only occur if the node has a grandparent
+  let parent = tree.parent!
+  let grandparent = parent.parent!
 
   if (grandparent.left === parent) {
     if (parent.left === tree) { // LL case
@@ -89,12 +87,9 @@ function rotate(tree: RedBlackTree<any>) {
   }
 }
 
-function recolor(parent: RedBlackTree<any>, uncle: RedBlackTree<any>, grandparent: RedBlackTree<any> | null) {
+function recolor(parent: RedBlackTree<any>, uncle: RedBlackTree<any>, grandparent: RedBlackTree<any>) {
   uncle.color = 'black'
   parent.color = 'black'
-
-  if (!grandparent) return
-
   grandparent.color = grandparent.parent ? 'red' : 'black'
 
   balanceFrom(grandparent)
@@ -102,19 +97,21 @@ function recolor(parent: RedBlackTree<any>, uncle: RedBlackTree<any>, grandparen
 
 function balanceFrom(node: RedBlackTree<any>) {
   let parent = node.parent
+  // If this is the root node, or the parent is black, the tree constraints are satisfied
   if (!parent || parent.color === 'black') {
     return
   }
 
-  let grandparent = parent?.parent
-  let uncle = null
-  if (grandparent) {
-    uncle = grandparent.left === parent
-      ? grandparent.right
-      : grandparent.left
-  }
+  // We can assert non-null here, as balancing will only take place once all nodes
+  // are far enough in the tree to have a grandparent
+  let grandparent = parent.parent!
+  let uncle = grandparent.left === parent
+    ? grandparent.right
+    : grandparent.left
 
-  if (uncle?.color === 'red') {
+  // TODO Can we refine the node types here so that null checks and non-null assertions
+  // are unnecessary in the recoloring and rotation functions?
+  if (uncle.color === 'red') {
     recolor(parent, uncle, grandparent)
   } else {
     rotate(node)
@@ -137,6 +134,5 @@ export default class RedBlackTree<WrappedType> extends BinarySearchTree<WrappedT
   insert(value: WrappedType) {
     let newNode = insertValue(this, value)
     balanceFrom(newNode)
-    console.log(this)
   }
 }

@@ -1,5 +1,6 @@
-import RedBlackTree from "../src/RedBlackTree";
-import { difference } from "ramda";
+import RedBlackTree from "../src/RedBlackTree"
+import { difference } from "ramda"
+import fc from 'fast-check'
 
 test('RedBlackTree traversals', () => {
   let tree = new RedBlackTree();
@@ -16,8 +17,7 @@ test('RedBlackTree traversals', () => {
   expect(inOrder).toBe('2, 3, 4, 8, 9, 10, 14, 19, 27, 31, 35, 42, 60')
   expect(preOrder).toBe('14, 3, 2, 9, 4, 8, 10, 31, 19, 27, 42, 35, 60')
   expect(postOrder).toBe('2, 8, 4, 10, 9, 3, 27, 19, 35, 60, 42, 31, 14')
-
-});
+})
 
 // TODO Try some property based testing here
 
@@ -39,4 +39,5 @@ test('RedBlackTree coloration', () => {
   for (let black of blackNodes) {
     expect((tree.search(black))?.color).toBe('black')
   }
-});
+})
+
